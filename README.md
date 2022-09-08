@@ -23,14 +23,17 @@ ports:
 depends_on:
 - prometheus44         <-- here we put the above defined service name make connection with Grafana
   
--------------------------------------------------
+
+
+
 volumes:
 - ./prometheus22:/etc/prometheus/    <-- in the application we have a folder name "prometheus22"
   and here we are trying to copy all the content from the
   folder and create a new folder in the docker container with the
 -                                   name "prometheus" and paste all the content in it
 
--------------------------------------------------------------
+
+
 services:
 prometheus44:
 depends_on:
