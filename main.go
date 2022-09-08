@@ -1,10 +1,10 @@
 package main
 
 import (
+	"Go_Prometheus_Grafana/middleware"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sunnykeila/Go_Prometheus_Grafana/middleware"
 	"net/http"
 )
 
