@@ -1,18 +1,18 @@
 version: "3"
 services:
-  prometheus:
+  prometheus44:
     image: prom/prometheus:latest
     volumes:
-      - ./prometheus:/etc/prometheus/
+      - ./prometheus22:/etc/prometheus/
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
     ports:
       - 9090:9090
     depends_on:
-      - go-service-with-metrics
+      - sunny-service
 
-  go-service-with-metrics:
+  sunny-service:
     build: .
     ports:
       - 8080:8080
@@ -22,4 +22,4 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - prometheus
+      - prometheus44

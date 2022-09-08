@@ -1,4 +1,4 @@
-module github.com/sunnykeila/Go_Prometheus_Grafana
+module Go_Prometheus_Grafana
 
 go 1.18
 

@@ -15,29 +15,28 @@ type MetricsMiddleware struct {
 }
 
 func NewMetricsMiddleware() *MetricsMiddleware {
-	opsProessed := promauto.NewCounterVec(prometheus.CounterOpts{
+	opsProcessed := promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "myapp_processed_ops_total",
-		Help: "The total number of processed events ",
+		Help: "The total number of processed events",
 	}, []string{"method", "path", "statuscode"})
-
 	return &MetricsMiddleware{
-		opsProcessed: opsProessed,
+		opsProcessed: opsProcessed,
 	}
 }
 
 // Metrics middleware to collect metrics from http requests
-func (Im *MetricsMiddleware) Metrics(next http.Handler) http.Handler {
+func (lm *MetricsMiddleware) Metrics(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
-
-		wi := &responseWriterInterceptor {
-			statusCode: http.StatusOK,
+		wi := &responseWriterInterceptor{
+			statusCode:     http.StatusOK,
 			ResponseWriter: w,
 		}
-		next.ServeHTTP(wi,r)
+		next.ServeHTTP(wi, r)
 
-		Im.opsProcessed.With(prometheus.Labels{"method": r.Method, "path": r.RequestURI, "statuscode": strconv.Itoa(wi.statusCode)}).Inc()
+		lm.opsProcessed.With(prometheus.Labels{"method": r.Method, "path": r.RequestURI, "statuscode": strconv.Itoa(wi.statusCode)}).Inc()
 	})
+	// "method"  <-- "GET" "POST"     these type of values will be sended to prem
 }
 
 // responseWriterInterceptor is a simple wrapper to intercept set data on a
@@ -54,20 +53,4 @@ func (w *responseWriterInterceptor) WriteHeader(statusCode int) {
 
 func (w *responseWriterInterceptor) Write(p []byte) (int, error) {
 	return w.ResponseWriter.Write(p)
-}
-
-func (w *responseWriterInterceptor) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	h, ok := w.ResponseWriter.(http.Hijacker)
-	if !ok {
-		return nil, nil, errors.New("type assertion failed http.ResponseWriter not a http.Hijacker")
-	}
-	return h.Hijack()
-}
-
-func (w *responseWriterInterceptor) Flush() {
-	f, ok := w.ResponseWriter.(http.Flusher)
-	if !ok {
-		return
-	}
-	f.Flush()
 }
